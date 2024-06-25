@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+</head>
+<body>
+<style>
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-brand div {
+      margin-left: 15px;
+    }
+
+    .input-box {
+      position: relative;
+      flex-grow: 1;
+      max-width: 800px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding-right: 2.5rem;
+    }
+
+    .input-box i {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .navbar-center {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .content-block {
+    display: flex;
+    justify-content: space-between;
+    }
+
+    .book-image-title, .book-actions {
+        flex: 1; /* Make these divs the same size */
+    }
+
+    .book-description {
+        flex: 2; /* Make this div larger */
+    }
+
+    .book-image-title, .book-description, .book-actions {
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .loadingDiv {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+    }
+
+    .spinner {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 75px;
+        height: 75px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .container {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #fff;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .link-primary {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .link-primary:hover {
+        text-decoration: underline;
+    }
+</style>
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <header>
+                {% include 'included/navbar.html' %}
+            </header>
+            <br>
+            {% block content %}
+            {% endblock %}
+            <br>
+        </div>
+    </div>
+</div>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap Bundle JS (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

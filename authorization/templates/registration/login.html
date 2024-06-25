@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load widget_tweaks %}
+
+{% block title %}
+Log into existing account
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 500px;">
+    <h2 class="text-center">Вхід до акаунту</h2>
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_username" class="form-label">Ім'я користувача</label>
+            <input type="text" name="username" class="form-control" id="id_username">
+        </div>
+        <div class="mb-3">
+            <label for="id_password" class="form-label">Пароль</label>
+            <input type="password" name="password" class="form-control" id="id_password">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Увійти</button>
+    </form>
+    <div class="text-center mt-3">
+        <p>Ще не маєте аккаунту? <a href="/auth/signup" class="link-primary">Зареєструватися</a></p>
+    </div>
+</div>
+{% endblock %}

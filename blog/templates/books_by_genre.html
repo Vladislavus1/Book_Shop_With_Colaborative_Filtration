@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+Книги жанру "{{ books_genre }}" - READMOL
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="book-category">
+        <h2>Книги жанру "{{ books_genre }}"</h2>
+            <div id="booksRow" class="row">
+                <div id="loadingBarBooks" class="loadingDiv">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+    </div>
+    <br>
+    <div id="loadMoreButton">
+        <center>
+            <button onclick="getBooks()" class="btn btn-primary d-flex">Показати більше</button>
+        </center>
+    </div>
+</div>
+<br>
+<script>
+let booksIndex = 2;
+function getBooks() {
+    fetch(`http://127.0.0.1:8000/get_books_by_genre/{{ books_genre }}/${booksIndex}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('loadingBarBooks').style.display = 'block';
+            let books = data["books"];
+            document.getElementById('loadingBarBooks').style.display = 'none';
+
+            for (const bookKey in books) {
+                if (books.hasOwnProperty(bookKey)) {
+                    const book = books[bookKey];
+                    const colDiv = document.createElement("div");
+                    colDiv.className = "col-md-4";
+                    colDiv.id = `book${book.book_id}`;
+
+                    const cardBordDiv = document.createElement("div");
+                    cardBordDiv.className = "card book-card";
+
+                    const bookImageElement = document.createElement("img");
+                    bookImageElement.className = "card-img-top book-image";
+                    bookImageElement.setAttribute("alt", book.book_title);
+                    bookImageElement.setAttribute("src", book.book_image);
+                    bookImageElement.setAttribute("width", 350);
+                    bookImageElement.setAttribute("height", 550);
+
+                    const cardBodyDiv = document.createElement("div");
+                    cardBodyDiv.className = "card-body";
+
+                    const bookTitleElementA = document.createElement("a");
+                    bookTitleElementA.setAttribute("href", `/book/${book.book_id}`);
+                    bookTitleElementA.className = "h5 card-title";
+                    bookTitleElementA.textContent = book.book_title;
+
+                    const bookAuthorElementP = document.createElement("p");
+                    bookAuthorElementP.className = "card-text";
+                    bookAuthorElementP.textContent = `Автор: ${book.book_author}`;
+
+                    const bookPriceElementP = document.createElement("p");
+                    bookPriceElementP.className = "card-text";
+                    bookPriceElementP.textContent = `Ціна: ${book.book_price}.00 ₴`;
+
+                    const booksRowDiv = document.getElementById("booksRow");
+
+                    cardBordDiv.appendChild(bookImageElement);
+                    cardBordDiv.appendChild(cardBodyDiv);
+                    cardBodyDiv.appendChild(bookTitleElementA);
+                    cardBodyDiv.appendChild(bookAuthorElementP);
+                    cardBodyDiv.appendChild(bookPriceElementP);
+                    colDiv.appendChild(cardBordDiv);
+                    booksRowDiv.appendChild(colDiv);
+                }
+            }
+
+            booksIndex += 1;
+
+            const length = Object.keys(books).length;
+            if (length < 45) {
+                document.getElementById("loadMoreButton").style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+        });
+}
+
+fetch(`http://127.0.0.1:8000/get_books_by_genre/{{ books_genre }}/1`)
+  .then(response => response.json())
+  .then(data => {
+      let books = data["books"];
+      document.getElementById('loadingBarBooks').style.display = 'none';
+      for (const bookKey in books) {
+        if (books.hasOwnProperty(bookKey)) {
+            const book = books[bookKey];
+
+            const colDiv = document.createElement("div")
+            colDiv.className = "col-md-4"
+            colDiv.id = `book${book.book_id}`
+
+            const cardBordDiv = document.createElement("div")
+            cardBordDiv.className = "card book-card"
+
+            const bookImageElement = document.createElement("img")
+            bookImageElement.className = "card-img-top book-image"
+            bookImageElement.setAttribute("alt", book.book_title)
+            bookImageElement.setAttribute("src", book.book_image)
+            bookImageElement.setAttribute("width", 350)
+            bookImageElement.setAttribute("height", 550)
+
+            const cardBodyDiv = document.createElement("div")
+            cardBodyDiv.className = "card-body"
+
+            const bookTitleElementA = document.createElement("a")
+            bookTitleElementA.setAttribute("href", `/book/${book.book_id}`)
+            bookTitleElementA.className = "h5 card-title"
+            bookTitleElementA.textContent = book.book_title
+
+            const bookAuthorElementP = document.createElement("p")
+            bookAuthorElementP.className = "card-text"
+            bookAuthorElementP.textContent = `Автор: ${book.book_author}`
+
+            const bookPriceElementP = document.createElement("p")
+            bookPriceElementP.className = "card-text"
+            bookPriceElementP.textContent = `Ціна: ${book.book_price}.00 ₴`
+
+            const booksRowDiv = document.getElementById("booksRow")
+
+            cardBordDiv.appendChild(bookImageElement)
+            cardBordDiv.appendChild(cardBodyDiv)
+            cardBodyDiv.appendChild(bookTitleElementA)
+            cardBodyDiv.appendChild(bookAuthorElementP)
+            cardBodyDiv.appendChild(bookPriceElementP)
+            colDiv.appendChild(cardBordDiv)
+            booksRowDiv.appendChild(colDiv)
+
+
+            const length = Object.keys(books).length;
+            if (length < 45) {
+                document.getElementById("loadMoreButton").style.display = 'none';
+            }
+        }
+      }
+  })
+  .catch(error => {
+      console.error('Fetch error:', error);
+});
+</script>
+{% endblock %}

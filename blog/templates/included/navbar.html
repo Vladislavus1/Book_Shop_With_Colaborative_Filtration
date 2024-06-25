@@ -1,0 +1,225 @@
+<nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center me-3" href="/">
+      <img src="https://i.ibb.co/ZSVZvcB/icon-removebg-preview-1.png" alt="" width="75" height="75" class="d-inline-block align-text-top">
+      <div>
+        <h5 class="mb-0">READEMOL</h5>
+        <p class="text-muted mb-0">- сайт для пошуку книг на вечір</p>
+      </div>
+    </a>
+    {% if user.is_authenticated %}
+      <div class="navbar-center">
+        <form class="d-flex w-100" action="/search" method="post">
+          {% csrf_token %}
+          <div class="input-box">
+            <input type="text" id="searchNavbarInput" class="form-control" name="searchRequest" placeholder="Пошук">
+            <i class="bi bi-search"></i>
+            <div class="searchHistoryData position-absolute" style="top: 100%; left: 0; z-index: 1000;">
+              <ul class="dropdown-menu" id="searchHistoryData">
+
+              </ul>
+            </div>
+            <div class="autoCompleteData position-absolute" style="top: 100%; left: 0; z-index: 1000;">
+              <ul class="dropdown-menu" id="autoCompleteData">
+              </ul>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="d-flex">
+          <a class="btn btn-outline-danger me-2" href="/favorite" style="text-decoration: none;"><i class="bi bi-heart"></i>  Обране</a>
+          <form action="{% url 'logout' %}" method="post">
+              {% csrf_token %}
+              <button class="btn btn-outline-secondary me-2" type="submit">Вийти</button>
+          </form>
+      </div>
+    {% else %}
+      <div class="d-flex">
+        <a href="/auth/login" class="btn btn-outline-secondary me-2" type="button">Увійти</a>
+        <a href="/auth/signup" class="btn btn-outline-secondary me-2" type="button">Зареєструватися</a>
+      </div>
+    {% endif %}
+  </div>
+</nav>
+
+<style>
+  .input-box {
+    position: relative;
+    width: 100%;
+  }
+  .searchHistoryData {
+    width: 100%;
+    max-width: 100%;
+  }
+  .autoCompleteData {
+    width: 100%;
+    max-width: 100%;
+  }
+</style>
+
+<script>
+function getCsrfToken() {
+  var metaTag = document.querySelector('meta[name="csrf-token"]');
+  if (metaTag) {
+    return metaTag.getAttribute('content');
+  } else {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      if (cookie.startsWith('csrftoken=')) {
+        return cookie.substring('csrftoken='.length, cookie.length);
+      }
+    }
+  }
+  return '';
+}
+
+let isRenderedSearchHistoryData = false;
+let isRenderedAutoCompleteData = false;
+
+const searchNavbarInput = document.getElementById('searchNavbarInput');
+const searchHistoryDataMenu = document.getElementById('searchHistoryData');
+const autoCompleteDataMenu = document.getElementById('autoCompleteData');
+
+function adjustWidths() {
+  if (searchNavbarInput && searchHistoryDataMenu && autoCompleteDataMenu) {
+    const inputWidth = searchNavbarInput.offsetWidth;
+    searchHistoryDataMenu.style.width = `${inputWidth}px`;
+    autoCompleteDataMenu.style.width = `${inputWidth}px`;
+  }
+}
+
+function showAutoCompleteData() {
+  const csrfToken = getCsrfToken();
+
+  if (searchNavbarInput && searchNavbarInput.value !== "") {
+    fetch(`http://127.0.0.1:8000/get_auto_complete_data/${searchNavbarInput.value}`)
+      .then(response => response.json())
+      .then(data => {
+        let autoCompleteDataList = data["auto_complete_data"];
+        autoCompleteDataMenu.innerHTML = '';
+        if (autoCompleteDataMenu && autoCompleteDataList.length !== 0) {
+          for (let item of autoCompleteDataList) {
+            const liElement = document.createElement('li');
+            const formElement = document.createElement('form');
+            formElement.setAttribute('action', '/search');
+            formElement.setAttribute('method', 'post');
+
+            const autoCompleteCsrfInput = document.createElement('input');
+            autoCompleteCsrfInput.type = 'hidden';
+            autoCompleteCsrfInput.name = 'csrfmiddlewaretoken';
+            autoCompleteCsrfInput.value = csrfToken;
+
+            const inputElement = document.createElement('input');
+            inputElement.className = "dropdown-item";
+            inputElement.setAttribute('name', 'searchRequest');
+            inputElement.setAttribute('value', item);
+            inputElement.setAttribute('type', 'submit');
+            inputElement.textContent = item;
+
+            formElement.appendChild(autoCompleteCsrfInput);
+            formElement.appendChild(inputElement);
+            liElement.appendChild(formElement);
+            autoCompleteDataMenu.appendChild(liElement);
+          }
+          autoCompleteDataMenu.style.display = "block";
+          isRenderedAutoCompleteData = true;
+        } else {
+          autoCompleteDataMenu.style.display = "none";
+          isRenderedAutoCompleteData = false;
+        }
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+      });
+  }
+}
+
+function showSearchHistory() {
+  const csrfToken = getCsrfToken();
+
+  if (searchNavbarInput && searchNavbarInput.value === "") {
+    fetch(`http://127.0.0.1:8000/get_search_history`)
+      .then(response => response.json())
+      .then(data => {
+        let searchHistory = data["search_history"];
+        searchHistoryDataMenu.innerHTML = '';
+        if (searchHistoryDataMenu && searchHistory.length !== 0) {
+          autoCompleteDataMenu.style.display = 'none';
+          for (let item of searchHistory) {
+            const liElement = document.createElement('li');
+            const formElement = document.createElement('form');
+            formElement.setAttribute('action', '/search');
+            formElement.setAttribute('method', 'post');
+
+            const searchHistoryCsrfInput = document.createElement('input');
+            searchHistoryCsrfInput.type = 'hidden';
+            searchHistoryCsrfInput.name = 'csrfmiddlewaretoken';
+            searchHistoryCsrfInput.value = csrfToken;
+
+            const inputElement = document.createElement('input');
+            inputElement.className = "dropdown-item";
+            inputElement.setAttribute('name', 'searchRequest');
+            inputElement.setAttribute('value', item);
+            inputElement.setAttribute('type', 'submit');
+            inputElement.textContent = item;
+
+            formElement.appendChild(searchHistoryCsrfInput);
+            formElement.appendChild(inputElement);
+            liElement.appendChild(formElement);
+            searchHistoryDataMenu.appendChild(liElement);
+          }
+          searchHistoryDataMenu.style.display = "block";
+          isRenderedSearchHistoryData = true;
+        }
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+      });
+  }
+}
+
+function hideSearchHistory() {
+  if (searchHistoryDataMenu) {
+    searchHistoryDataMenu.style.display = "none";
+    searchHistoryDataMenu.innerHTML = '';
+    isRenderedSearchHistoryData = false;
+  }
+}
+
+function hideAutoCompleteData() {
+  if (autoCompleteDataMenu) {
+    autoCompleteDataMenu.style.display = "none";
+    autoCompleteDataMenu.innerHTML = '';
+    isRenderedAutoCompleteData = false;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  adjustWidths();
+
+  if (searchNavbarInput) {
+    searchNavbarInput.addEventListener('focus', () => {
+      showSearchHistory();
+    });
+
+    searchNavbarInput.addEventListener('input', (event) => {
+      if (event.target.value !== "") {
+        hideSearchHistory();
+        showAutoCompleteData();
+      } else {
+        hideAutoCompleteData();
+        showSearchHistory();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!searchNavbarInput.contains(event.target) && !searchHistoryDataMenu.contains(event.target)) {
+        hideSearchHistory();
+      }
+    });
+
+    window.addEventListener('resize', adjustWidths);
+  }
+});
+</script>

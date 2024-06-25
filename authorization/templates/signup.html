@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% load widget_tweaks %}
+
+{% block title %} Sign up {% endblock %}
+
+{% block content %}
+
+<div class="container my-5" style="max-width: 500px;">
+    <h2 class="text-center">Реєстрація</h2>
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.username.label_tag }}
+            {{ form.username|add_class:'form-control' }}
+        </div>
+        <div class="mb-3">
+            {{ form.first_name.label_tag }}
+            {{ form.first_name|add_class:'form-control' }}
+        </div>
+        <div class="mb-3">
+            {{ form.surname.label_tag }}
+            {{ form.surname|add_class:'form-control' }}
+        </div>
+        <div class="mb-3">
+            {{ form.email.label_tag }}
+            {{ form.email|add_class:'form-control' }}
+        </div>
+        <div class="mb-3">
+            {{ form.password1.label_tag }}
+            {{ form.password1|add_class:'form-control' }}
+        </div>
+        <div class="mb-3">
+            {{ form.password2.label_tag }}
+            {{ form.password2|add_class:'form-control' }}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Зареєструватися</button>
+    </form>
+    <div class="text-center mt-3">
+        <p>Вже маєте аккаунт? <a href="/auth/login" class="link-primary">Увійти</a></p>
+    </div>
+</div>
+{% endblock %}

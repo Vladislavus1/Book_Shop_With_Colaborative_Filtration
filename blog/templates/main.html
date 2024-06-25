@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}
+READEMOL - інтернет додаток для пошуку книг
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="book-category">
+    <a href="/books/Детективи" class="h2" style="text-decoration: none;">Детективи</a>
+    <div id="detectivesRow" class="row">
+      <div id="loadingBarDetectives" class="loadingDiv">
+          <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="book-category">
+    <a href="/books/Трилери" class="h2" style="text-decoration: none;">Трилери</a>
+    <div id="thrillersRow" class="row">
+      <div id="loadingBarThrillers" class="loadingDiv">
+          <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="book-category">
+    <a href="/books/Фентезі" class="h2" style="text-decoration: none;">Фентезі</a>
+    <div id="fantasyRow" class="row">
+      <div id="loadingBarFantasy" class="loadingDiv">
+          <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="book-category">
+    <a href="/books/Романтика" class="h2" style="text-decoration: none;">Романтика</a>
+    <div id="romanticsRow" class="row">
+      <div id="loadingBarRomantics" class="loadingDiv">
+          <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="book-category">
+    <a href="/books/Бойовики" class="h2" style="text-decoration: none;">Бойовики</a>
+    <div id="fightersRow" class="row">
+      <div id="loadingBarFighters" class="loadingDiv">
+          <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+  <br>
+  {% if user.is_authenticated %}
+    <div class="book-category">
+      <a href="/books_for_user" class="h2" style="text-decoration: none;">Для вас</a>
+      <div id="recommendationRow" class="row">
+        <div id="loadingBarRecommendation" class="loadingDiv">
+            <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+  <br>
+</div>
+<script>
+function displayBooksByGenre (genre, loadingBarId, genreRowId) {
+  fetch(`http://127.0.0.1:8000/get_book_samples/${genre}`)
+    .then(response => response.json())
+    .then(data => {
+        let books = data["books"];
+        document.getElementById(loadingBarId).style.display = 'none';
+        for (const bookKey in books) {
+          if (books.hasOwnProperty(bookKey)) {
+              const book = books[bookKey];
+
+              const colDiv = document.createElement("div")
+              colDiv.className = "col-md-4"
+              colDiv.id = `book${book.book_id}`
+
+              const cardBordDiv = document.createElement("div")
+              cardBordDiv.className = "card book-card"
+
+              const bookImageElement = document.createElement("img")
+              bookImageElement.className = "card-img-top book-image"
+              bookImageElement.setAttribute("alt", book.book_title)
+              bookImageElement.setAttribute("src", book.book_image)
+              bookImageElement.setAttribute("width", 350)
+              bookImageElement.setAttribute("height", 550)
+
+              const cardBodyDiv = document.createElement("div")
+              cardBodyDiv.className = "card-body"
+
+              const bookTitleElementA = document.createElement("a")
+              bookTitleElementA.setAttribute("href", `/book/${book.book_id}`)
+              bookTitleElementA.className = "h5 card-title"
+              bookTitleElementA.textContent = book.book_title
+
+              const bookAuthorElementP = document.createElement("p")
+              bookAuthorElementP.className = "card-text"
+              bookAuthorElementP.textContent = `Автор: ${book.book_author}`
+
+              const bookPriceElementP = document.createElement("p")
+              bookPriceElementP.className = "card-text"
+              bookPriceElementP.textContent = `Ціна: ${book.book_price}.00 ₴`
+
+              const detectiveRowDiv = document.getElementById(genreRowId)
+
+              cardBordDiv.appendChild(bookImageElement)
+              cardBordDiv.appendChild(cardBodyDiv)
+              cardBodyDiv.appendChild(bookTitleElementA)
+              cardBodyDiv.appendChild(bookAuthorElementP)
+              cardBodyDiv.appendChild(bookPriceElementP)
+              colDiv.appendChild(cardBordDiv)
+              detectiveRowDiv.appendChild(colDiv)
+          }
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+  });
+}
+book_genres = {"Детективи": {"loadingBarId": "loadingBarDetectives", "genreRowId": "detectivesRow"},
+               "Трилери": {"loadingBarId": "loadingBarThrillers", "genreRowId": "thrillersRow"},
+               "Фентезі": {"loadingBarId": "loadingBarFantasy", "genreRowId": "fantasyRow"},
+               "Романтика": {"loadingBarId": "loadingBarRomantics", "genreRowId": "romanticsRow"},
+               "Бойовики": {"loadingBarId": "loadingBarFighters", "genreRowId": "fightersRow"},
+}
+
+for (let genre in book_genres) {
+    displayBooksByGenre(genre, book_genres[genre]["loadingBarId"], book_genres[genre]["genreRowId"])
+}
+{% if user.is_authenticated %}
+  fetch(`http://127.0.0.1:8000/get_books_samples_for_user`)
+    .then(response => response.json())
+    .then(data => {
+        let books = data["books"];
+        document.getElementById('loadingBarRecommendation').style.display = 'none';
+        for (const bookKey in books) {
+          if (books.hasOwnProperty(bookKey)) {
+              const book = books[bookKey];
+
+              const colDiv = document.createElement("div")
+              colDiv.className = "col-md-4"
+              colDiv.id = `book${book.book_id}`
+
+              const cardBordDiv = document.createElement("div")
+              cardBordDiv.className = "card book-card"
+
+              const bookImageElement = document.createElement("img")
+              bookImageElement.className = "card-img-top book-image"
+              bookImageElement.setAttribute("alt", book.book_title)
+              bookImageElement.setAttribute("src", book.book_image)
+              bookImageElement.setAttribute("width", 350)
+              bookImageElement.setAttribute("height", 550)
+
+              const cardBodyDiv = document.createElement("div")
+              cardBodyDiv.className = "card-body"
+
+              const bookTitleElementA = document.createElement("a")
+              bookTitleElementA.setAttribute("href", `/book/${book.book_id}`)
+              bookTitleElementA.className = "h5 card-title"
+              bookTitleElementA.textContent = book.book_title
+
+              const bookAuthorElementP = document.createElement("p")
+              bookAuthorElementP.className = "card-text"
+              bookAuthorElementP.textContent = `Автор: ${book.book_author}`
+
+              const bookPriceElementP = document.createElement("p")
+              bookPriceElementP.className = "card-text"
+              bookPriceElementP.textContent = `Ціна: ${book.book_price}.00 ₴`
+
+              const recommendationRowDiv = document.getElementById("recommendationRow")
+
+              cardBordDiv.appendChild(bookImageElement)
+              cardBordDiv.appendChild(cardBodyDiv)
+              cardBodyDiv.appendChild(bookTitleElementA)
+              cardBodyDiv.appendChild(bookAuthorElementP)
+              cardBodyDiv.appendChild(bookPriceElementP)
+              colDiv.appendChild(cardBordDiv)
+              recommendationRowDiv.appendChild(colDiv)
+          }
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+  });
+{% endif %}
+</script>
+{% endblock %}
