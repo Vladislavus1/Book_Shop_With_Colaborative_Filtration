@@ -207,29 +207,3 @@ def if_favorite_json(request, book_id):
     else:
         json_response = {"if_favorite": 0}
     return JsonResponse(json_response)
-# def add_test_data(request):
-#     import csv; import os;
-#     if not os.path.exists("test_data/status.txt"):
-#         genres = ["Бойовики", "Детективи", "Романтика", "Трилери", "Фентезі"]
-#         for genre in genres:
-#             with open(fr"C:\Users\tvtes\AppData\Local\Programs\Python\workspace\Portfolio_Projects\Project_1\blog\test_data\{genre}.csv", "r", encoding="utf-8") as books:
-#                 books = list(csv.reader(books))[1:]
-#                 for row in books:
-#                     print(row)
-#                     book_title = row[0]
-#                     book_image = row[1]
-#                     book_price = row[2]
-#                     book_author = row[3]
-#                     book_genre = genre
-#                     book_url = row[5]
-#                     print(book_genre)
-#                     new_book = Book(book_title=book_title,
-#                                     book_image=book_image,
-#                                     book_price=book_price,
-#                                     book_author=book_author,
-#                                     book_genre=book_genre,
-#                                     book_url=book_url)
-#                     new_book.save()
-#     else:
-#         print("Data is already in database.")
-#     return redirect("/")
